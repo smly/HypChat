@@ -1,9 +1,9 @@
 import os, os.path
-import ConfigParser
+from six.moves.configparser import ConfigParser
 import sys
 from hypchat import *
 
-config = ConfigParser.ConfigParser()
+config = ConfigParser()
 config.read([os.path.expanduser('~/.hypchat'), '/etc/hypchat'])
 AUTH_TOKEN = config.get('HipChat', 'token')
 
@@ -15,8 +15,8 @@ hipchat = HypChat(AUTH_TOKEN)
 import datetime
 
 room = hipchat.rooms()['items'][0]
-print room['name']
+print(room['name'])
 hist = room.history(datetime.datetime.utcnow(), maxResults=500)
 fullhist = []
 for item in hist.contents():
-	print item['message']
+	print(item['message'])

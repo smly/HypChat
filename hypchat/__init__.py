@@ -1,11 +1,12 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
+
 import json
 import time
 import warnings
 import sys
 import os
 import datetime
-from .requests import Requests, BearerAuth, HttpForbidden
+from .request import Requests, BearerAuth, HttpForbidden
 from .restobject import Linker
 
 class RateLimitWarning(Warning):
@@ -30,12 +31,12 @@ class _requests(Requests):
 
 	@staticmethod
 	def _data(data, kwargs):
-		if isinstance(data, basestring):
+		if isinstance(data, str):
 			return data
 		elif data is not None:
 			kwargs.setdefault('headers',{})['Content-Type'] = 'application/json'
 			rv = json.dumps(data, default=jsonify)
-			print rv
+			print(rv)
 			return rv
 
 	def _rl_sleep(self, until):
@@ -46,14 +47,15 @@ class _requests(Requests):
 
 	def request(self, method, url, **kwargs):
 		if self.dump_reqs:
-			print >> sys.stderr, "REQUEST", method, url
+			print("REQUEST", method, url, file=sys.stderr)
+
 		while True:
 			try:
 				if self.rl_remaining <= 0:
 					# We're out of requests, chill
 					self._rl_sleep(self.rl_reset)
 				resp = super(_requests, self).request(method, url, **kwargs)
-			except HttpForbidden, e:
+			except HttpForbidden as e:
 				#FIXME: Is there a better way to do this?
 				if e.response.json()['error']['message'] == u'You have exceeded the rate limit. See https://www.hipchat.com/docs/api/rate_limiting':
 					self.rl_remaining = int(e.response.headers['x-ratelimit-remaining'])

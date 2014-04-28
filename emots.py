@@ -4,11 +4,11 @@ Writes out emots.html, and index of all emoticons available to you.
 """
 
 import os, os.path
-import ConfigParser
+from six.moves.configparser import ConfigParser
 import sys
 from hypchat import *
 
-config = ConfigParser.ConfigParser()
+config = ConfigParser()
 config.read([os.path.expanduser('~/.hypchat'), '/etc/hypchat'])
 AUTH_TOKEN = config.get('HipChat', 'token')
 
